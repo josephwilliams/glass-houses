@@ -127,7 +127,8 @@ export default function WorldMap({
               >
                 {(mercator) =>
                   mercator.features.map(({ feature, path }, i) => {
-                    const rawId = feature.id;
+                    const rawId = feature.id as string | undefined;
+                    if (!rawId) return null;
                     const id = resolveId(rawId);
                     const isSelected = selectedCountry === id;
                     const isHovered = hoveredRef.current === rawId;
