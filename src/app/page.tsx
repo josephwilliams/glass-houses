@@ -85,6 +85,7 @@ export default function Home() {
               countryId={selectedCountry}
               onClose={() => { setSelectedCountry(null); setPanelExpanded(false); }}
               filterCategory={filterCategory}
+              onFilterChange={setFilterCategory}
               expanded={panelExpanded}
               onToggleExpand={() => setPanelExpanded((v) => !v)}
             />

@@ -14,19 +14,31 @@ const allCategories: Category[] = ["war", "internal", "political", "colonial", "
 function CategoryBadge({ category }: { category: Category }) {
   return (
     <span
-      className="inline-block px-2 py-0.5 rounded-full text-xs font-medium"
+      className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium"
       style={{
         background: categoryColors[category] + "22",
         color: categoryColors[category],
         border: `1px solid ${categoryColors[category]}44`,
       }}
     >
+      <span
+        className="w-2 h-2 rounded-full flex-shrink-0"
+        style={{ background: categoryColors[category] }}
+      />
       {categoryLabels[category]}
     </span>
   );
 }
 
-function CategoryCounts({ entries }: { entries: Atrocity[] }) {
+function CategoryCounts({
+  entries,
+  activeFilter,
+  onFilterChange,
+}: {
+  entries: Atrocity[];
+  activeFilter: Category | "all";
+  onFilterChange: (cat: Category | "all") => void;
+}) {
   const counts = new Map<Category, number>();
   for (const e of entries) {
     counts.set(e.category, (counts.get(e.category) || 0) + 1);
@@ -37,22 +49,31 @@ function CategoryCounts({ entries }: { entries: Atrocity[] }) {
 
   return (
     <div className="flex flex-wrap gap-2">
-      {nonZero.map((cat) => (
-        <span
-          key={cat}
-          className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs"
-          style={{
-            background: categoryColors[cat] + "15",
-            color: categoryColors[cat],
-          }}
-        >
-          <span
-            className="w-2 h-2 rounded-full"
-            style={{ background: categoryColors[cat] }}
-          />
-          {categoryLabels[cat]}: {counts.get(cat)}
-        </span>
-      ))}
+      {nonZero.map((cat) => {
+        const isActive = activeFilter === cat;
+        return (
+          <button
+            key={cat}
+            onClick={() => onFilterChange(isActive ? "all" : cat)}
+            className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs cursor-pointer transition-all"
+            style={{
+              background: isActive
+                ? categoryColors[cat] + "40"
+                : categoryColors[cat] + "15",
+              color: categoryColors[cat],
+              border: isActive
+                ? `1px solid ${categoryColors[cat]}88`
+                : "1px solid transparent",
+            }}
+          >
+            <span
+              className="w-2 h-2 rounded-full"
+              style={{ background: categoryColors[cat] }}
+            />
+            {categoryLabels[cat]}: {counts.get(cat)}
+          </button>
+        );
+      })}
       <span className="text-xs text-[var(--muted)] self-center">
         {entries.length} total
       </span>
@@ -94,12 +115,14 @@ export default function AtrocityPanel({
   countryId,
   onClose,
   filterCategory,
+  onFilterChange,
   expanded = false,
   onToggleExpand,
 }: {
   countryId: string;
   onClose: () => void;
   filterCategory: Category | "all";
+  onFilterChange: (cat: Category | "all") => void;
   expanded?: boolean;
   onToggleExpand?: () => void;
 }) {
@@ -140,7 +163,7 @@ export default function AtrocityPanel({
             </button>
           </div>
         </div>
-        <CategoryCounts entries={entries} />
+        <CategoryCounts entries={entries} activeFilter={filterCategory} onFilterChange={onFilterChange} />
       </div>
 
       <div className="flex-1 overflow-y-auto p-4">
