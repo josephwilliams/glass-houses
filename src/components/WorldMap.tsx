@@ -135,7 +135,6 @@ export default function WorldMap({
                     const hasEntries = !!atrocities[id];
 
                     let fill = "#1a1a2e";
-                    if (hasEntries) fill = "#1e293b";
                     if (isHovered && hasEntries) fill = "#334155";
                     if (isSelected) fill = "#475569";
 

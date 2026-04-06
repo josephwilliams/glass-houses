@@ -94,10 +94,14 @@ export default function AtrocityPanel({
   countryId,
   onClose,
   filterCategory,
+  expanded = false,
+  onToggleExpand,
 }: {
   countryId: string;
   onClose: () => void;
   filterCategory: Category | "all";
+  expanded?: boolean;
+  onToggleExpand?: () => void;
 }) {
   const entries = atrocities[countryId] || [];
   const name = countryNames[countryId] || "Unknown";
@@ -118,12 +122,23 @@ export default function AtrocityPanel({
       <div className="p-4 border-b border-[var(--border)]">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-xl font-bold">{name}</h2>
-          <button
-            onClick={onClose}
-            className="text-[var(--muted)] hover:text-white transition-colors text-2xl leading-none"
-          >
-            &times;
-          </button>
+          <div className="flex items-center gap-2">
+            {onToggleExpand && (
+              <button
+                onClick={onToggleExpand}
+                className="hidden md:inline-block text-[var(--muted)] hover:text-white transition-colors text-sm px-2 py-1 border border-[var(--border)] rounded"
+                title={expanded ? "Collapse panel" : "Expand panel"}
+              >
+                {expanded ? "Collapse" : "Expand"}
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="text-[var(--muted)] hover:text-white transition-colors text-2xl leading-none"
+            >
+              &times;
+            </button>
+          </div>
         </div>
         <CategoryCounts entries={entries} />
       </div>
@@ -134,7 +149,7 @@ export default function AtrocityPanel({
             No entries for this category.
           </p>
         ) : (
-          <div className="flex flex-col gap-3">
+          <div className={`grid gap-3 ${expanded ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" : "grid-cols-1"}`}>
             {sorted.map((entry, i) => (
               <AtrocityCard key={i} entry={entry} />
             ))}

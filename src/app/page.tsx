@@ -21,6 +21,7 @@ export default function Home() {
   const [filterCategory, setFilterCategory] = useState<Category | "all">(
     "all"
   );
+  const [panelExpanded, setPanelExpanded] = useState(false);
 
   const countryIds = Object.keys(atrocities);
   const pickRandom = useCallback(() => {
@@ -75,11 +76,17 @@ export default function Home() {
 
         {/* Detail panel */}
         {selectedCountry && (
-          <div className="md:w-[420px] border-l border-[var(--border)] overflow-hidden bg-[#0d0d0d] flex-shrink-0 h-full md:h-auto">
+          <div
+            className={`border-l border-[var(--border)] overflow-hidden bg-[#0d0d0d] flex-shrink-0 h-full md:h-auto transition-all duration-300 w-full ${
+              panelExpanded ? "md:w-[90%]" : "md:w-[420px]"
+            }`}
+          >
             <AtrocityPanel
               countryId={selectedCountry}
-              onClose={() => setSelectedCountry(null)}
+              onClose={() => { setSelectedCountry(null); setPanelExpanded(false); }}
               filterCategory={filterCategory}
+              expanded={panelExpanded}
+              onToggleExpand={() => setPanelExpanded((v) => !v)}
             />
           </div>
         )}
