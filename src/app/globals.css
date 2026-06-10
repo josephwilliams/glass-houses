@@ -1,19 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&display=swap');
 @import "tailwindcss";
 
 :root {
-  --bg: #0a0a0a;
-  --fg: #ededed;
-  --muted: #666;
-  --border: #333;
-  --cat-war: #ef4444;
-  --cat-internal: #f59e0b;
-  --cat-political: #8b5cf6;
-  --cat-colonial: #06b6d4;
-  --cat-meme: #ec4899;
+  --bg: #060b18;
+  --bg-raised: #0c1428;
+  --bg-surface: #141e36;
+  --fg: #f0ece6;
+  --fg-dim: #b0a898;
+  --fg-faint: #5a6878;
+  --border: #1e3050;
+  --border-subtle: #152440;
+  --accent: #e07040;
+  --accent-dim: #a04828;
+
+  --cat-war: #e05a3a;
+  --cat-internal: #d4a040;
+  --cat-political: #9a7ad0;
+  --cat-colonial: #50b8c8;
+  --cat-meme: #d068a0;
+
+  --font-display: 'Instrument Serif', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
 }
 
 body {
   background: var(--bg);
   color: var(--fg);
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--fg);
 }

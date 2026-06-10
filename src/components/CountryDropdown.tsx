@@ -22,9 +22,10 @@ export default function CountryDropdown({
       onChange={(e) =>
         onSelectCountry(e.target.value === "" ? null : e.target.value)
       }
-      className="bg-[#1a1a2e] border border-[var(--border)] text-[var(--fg)] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#555] w-full max-w-xs"
+      className="bg-[var(--bg-raised)] border border-[var(--border)] text-[var(--fg-dim)] rounded px-3 py-2 text-xs tracking-wide focus:outline-none focus:border-[var(--fg-faint)] w-full max-w-[180px] appearance-none cursor-pointer"
+      style={{ fontFamily: "var(--font-body)" }}
     >
-      <option value="">Select a country...</option>
+      <option value="">Search country…</option>
       {countries.map(([id, name]) => (
         <option key={id} value={id}>
           {name}
