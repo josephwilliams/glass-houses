@@ -1,32 +1,33 @@
 import type { Metadata } from "next";
+import { site } from "@/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Glass Houses",
-  description: "Click a country. Learn something uncomfortable. An interactive globe exploring historical atrocities worldwide.",
-  metadataBase: new URL("https://glass-houses.vercel.app"),
+  title: site.name,
+  description: site.description,
+  metadataBase: new URL(site.url),
   icons: {
     icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>",
   },
   openGraph: {
-    title: "Glass Houses",
-    description: "Click a country. Learn something uncomfortable.",
-    url: "https://glass-houses.vercel.app",
-    siteName: "Glass Houses",
+    title: site.name,
+    description: site.tagline,
+    url: site.url,
+    siteName: site.name,
     images: [
       {
         url: "/og.png",
         width: 1200,
         height: 630,
-        alt: "Glass Houses - an interactive globe of historical atrocities",
+        alt: `${site.name} — an interactive globe of historical atrocities`,
       },
     ],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Glass Houses",
-    description: "Click a country. Learn something uncomfortable.",
+    title: site.name,
+    description: site.tagline,
     images: ["/og.png"],
   },
 };

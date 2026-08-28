@@ -5,9 +5,19 @@ export interface Atrocity {
   year: string;
   category: Category;
   description: string;
-  target?: string; // country code if done TO another country
-  source?: string; // URL (Wikipedia, etc.)
+  /** ISO 3166-1 numeric code of the country this was done to, if any. */
+  target?: string;
+  source?: string;
 }
+
+/** Display order for category chips, filters and legends. */
+export const categoryOrder: Category[] = [
+  "war",
+  "internal",
+  "political",
+  "colonial",
+  "meme",
+];
 
 export const categoryLabels: Record<Category, string> = {
   war: "War / Military",
@@ -18,58 +28,226 @@ export const categoryLabels: Record<Category, string> = {
 };
 
 export const categoryColors: Record<Category, string> = {
-  war: "var(--cat-war)",
-  internal: "var(--cat-internal)",
-  political: "var(--cat-political)",
-  colonial: "var(--cat-colonial)",
-  meme: "var(--cat-meme)",
+  war: "#e05a3a",
+  internal: "#d4a040",
+  political: "#9a7ad0",
+  colonial: "#50b8c8",
+  meme: "#d068a0",
 };
 
-export const countryNames: Record<string, string> = {
-  "840": "United States", "124": "Canada", "484": "Mexico", "076": "Brazil",
-  "032": "Argentina", "152": "Chile", "170": "Colombia", "600": "Paraguay",
-  "858": "Uruguay", "068": "Bolivia", "604": "Peru", "862": "Venezuela",
-  "218": "Ecuador", "328": "Guyana", "740": "Suriname", "320": "Guatemala",
-  "222": "El Salvador", "340": "Honduras", "558": "Nicaragua", "591": "Panama",
-  "188": "Costa Rica", "192": "Cuba", "332": "Haiti", "214": "Dominican Republic",
-  "388": "Jamaica", "780": "Trinidad and Tobago", "084": "Belize", "044": "Bahamas",
-  "826": "United Kingdom", "276": "Germany", "643": "Russia", "250": "France",
-  "380": "Italy", "724": "Spain", "620": "Portugal", "056": "Belgium",
-  "528": "Netherlands", "040": "Austria", "756": "Switzerland", "372": "Ireland",
-  "616": "Poland", "804": "Ukraine", "348": "Hungary", "642": "Romania",
-  "100": "Bulgaria", "688": "Serbia", "191": "Croatia", "070": "Bosnia and Herzegovina",
-  "300": "Greece", "196": "Cyprus", "578": "Norway", "752": "Sweden",
-  "208": "Denmark", "246": "Finland", "352": "Iceland", "428": "Latvia",
-  "440": "Lithuania", "233": "Estonia", "112": "Belarus", "498": "Moldova",
-  "008": "Albania", "807": "North Macedonia", "499": "Montenegro", "383": "Kosovo",
-  "203": "Czech Republic", "703": "Slovakia", "442": "Luxembourg", "470": "Malta",
-  "268": "Georgia", "051": "Armenia", "031": "Azerbaijan", "336": "Vatican City",
-  "792": "Turkey", "368": "Iraq", "760": "Syria", "682": "Saudi Arabia",
-  "364": "Iran", "004": "Afghanistan", "376": "Israel", "275": "Palestine",
-  "422": "Lebanon", "400": "Jordan", "887": "Yemen", "784": "UAE",
-  "634": "Qatar", "048": "Bahrain", "512": "Oman", "414": "Kuwait",
-  "398": "Kazakhstan", "860": "Uzbekistan", "762": "Tajikistan", "795": "Turkmenistan",
-  "417": "Kyrgyzstan", "356": "India", "586": "Pakistan", "050": "Bangladesh",
-  "144": "Sri Lanka", "524": "Nepal", "064": "Bhutan", "462": "Maldives",
-  "156": "China", "392": "Japan", "410": "South Korea", "408": "North Korea",
-  "496": "Mongolia", "158": "Taiwan", "104": "Myanmar", "764": "Thailand",
-  "704": "Vietnam", "116": "Cambodia", "418": "Laos", "360": "Indonesia",
-  "608": "Philippines", "458": "Malaysia", "702": "Singapore", "096": "Brunei",
-  "626": "East Timor", "036": "Australia", "554": "New Zealand",
-  "598": "Papua New Guinea", "242": "Fiji", "710": "South Africa", "566": "Nigeria",
-  "180": "DR Congo", "646": "Rwanda", "800": "Uganda", "404": "Kenya",
-  "231": "Ethiopia", "232": "Eritrea", "736": "Sudan", "728": "South Sudan",
-  "434": "Libya", "012": "Algeria", "504": "Morocco", "818": "Egypt",
-  "788": "Tunisia", "024": "Angola", "508": "Mozambique", "716": "Zimbabwe",
-  "894": "Zambia", "148": "Chad", "562": "Niger", "466": "Mali",
-  "854": "Burkina Faso", "288": "Ghana", "384": "Ivory Coast", "694": "Sierra Leone",
-  "430": "Liberia", "324": "Guinea", "686": "Senegal", "270": "Gambia",
-  "478": "Mauritania", "454": "Malawi", "450": "Madagascar", "834": "Tanzania",
-  "706": "Somalia", "108": "Burundi", "140": "Central African Republic",
-  "226": "Equatorial Guinea", "768": "Togo", "204": "Benin",
-  "178": "Republic of Congo", "266": "Gabon", "516": "Namibia", "072": "Botswana",
-  "120": "Cameroon", "426": "Lesotho", "748": "Eswatini", "262": "Djibouti",
-  "174": "Comoros",
+/** Sidebar grouping, in display order. */
+export const regions = [
+  "Americas",
+  "Europe",
+  "Middle East",
+  "Africa",
+  "South Asia",
+  "East Asia",
+  "Southeast Asia",
+  "Central Asia",
+  "Oceania",
+] as const;
+
+export type Region = (typeof regions)[number];
+
+export interface Country {
+  name: string;
+  region: Region;
+}
+
+/**
+ * Keyed by ISO 3166-1 numeric code, matching the ids in the world-atlas
+ * topology the globe is built from. Every country listed here must also have
+ * a region so it can be grouped in the sidebar.
+ */
+export const countries: Record<string, Country> = {
+  // Americas
+  "032": { name: "Argentina", region: "Americas" },
+  "044": { name: "Bahamas", region: "Americas" },
+  "084": { name: "Belize", region: "Americas" },
+  "068": { name: "Bolivia", region: "Americas" },
+  "076": { name: "Brazil", region: "Americas" },
+  "124": { name: "Canada", region: "Americas" },
+  "152": { name: "Chile", region: "Americas" },
+  "170": { name: "Colombia", region: "Americas" },
+  "188": { name: "Costa Rica", region: "Americas" },
+  "192": { name: "Cuba", region: "Americas" },
+  "214": { name: "Dominican Republic", region: "Americas" },
+  "218": { name: "Ecuador", region: "Americas" },
+  "222": { name: "El Salvador", region: "Americas" },
+  "320": { name: "Guatemala", region: "Americas" },
+  "328": { name: "Guyana", region: "Americas" },
+  "332": { name: "Haiti", region: "Americas" },
+  "340": { name: "Honduras", region: "Americas" },
+  "388": { name: "Jamaica", region: "Americas" },
+  "484": { name: "Mexico", region: "Americas" },
+  "558": { name: "Nicaragua", region: "Americas" },
+  "591": { name: "Panama", region: "Americas" },
+  "600": { name: "Paraguay", region: "Americas" },
+  "604": { name: "Peru", region: "Americas" },
+  "740": { name: "Suriname", region: "Americas" },
+  "780": { name: "Trinidad and Tobago", region: "Americas" },
+  "840": { name: "United States", region: "Americas" },
+  "858": { name: "Uruguay", region: "Americas" },
+  "862": { name: "Venezuela", region: "Americas" },
+
+  // Europe
+  "008": { name: "Albania", region: "Europe" },
+  "051": { name: "Armenia", region: "Europe" },
+  "040": { name: "Austria", region: "Europe" },
+  "031": { name: "Azerbaijan", region: "Europe" },
+  "112": { name: "Belarus", region: "Europe" },
+  "056": { name: "Belgium", region: "Europe" },
+  "070": { name: "Bosnia and Herzegovina", region: "Europe" },
+  "100": { name: "Bulgaria", region: "Europe" },
+  "191": { name: "Croatia", region: "Europe" },
+  "196": { name: "Cyprus", region: "Europe" },
+  "203": { name: "Czech Republic", region: "Europe" },
+  "208": { name: "Denmark", region: "Europe" },
+  "233": { name: "Estonia", region: "Europe" },
+  "246": { name: "Finland", region: "Europe" },
+  "250": { name: "France", region: "Europe" },
+  "268": { name: "Georgia", region: "Europe" },
+  "276": { name: "Germany", region: "Europe" },
+  "300": { name: "Greece", region: "Europe" },
+  "348": { name: "Hungary", region: "Europe" },
+  "352": { name: "Iceland", region: "Europe" },
+  "372": { name: "Ireland", region: "Europe" },
+  "380": { name: "Italy", region: "Europe" },
+  "383": { name: "Kosovo", region: "Europe" },
+  "428": { name: "Latvia", region: "Europe" },
+  "440": { name: "Lithuania", region: "Europe" },
+  "442": { name: "Luxembourg", region: "Europe" },
+  "470": { name: "Malta", region: "Europe" },
+  "498": { name: "Moldova", region: "Europe" },
+  "499": { name: "Montenegro", region: "Europe" },
+  "528": { name: "Netherlands", region: "Europe" },
+  "807": { name: "North Macedonia", region: "Europe" },
+  "578": { name: "Norway", region: "Europe" },
+  "616": { name: "Poland", region: "Europe" },
+  "620": { name: "Portugal", region: "Europe" },
+  "642": { name: "Romania", region: "Europe" },
+  "643": { name: "Russia", region: "Europe" },
+  "688": { name: "Serbia", region: "Europe" },
+  "703": { name: "Slovakia", region: "Europe" },
+  "724": { name: "Spain", region: "Europe" },
+  "752": { name: "Sweden", region: "Europe" },
+  "756": { name: "Switzerland", region: "Europe" },
+  "804": { name: "Ukraine", region: "Europe" },
+  "826": { name: "United Kingdom", region: "Europe" },
+  "336": { name: "Vatican City", region: "Europe" },
+
+  // Middle East
+  "004": { name: "Afghanistan", region: "Middle East" },
+  "048": { name: "Bahrain", region: "Middle East" },
+  "364": { name: "Iran", region: "Middle East" },
+  "368": { name: "Iraq", region: "Middle East" },
+  "376": { name: "Israel", region: "Middle East" },
+  "400": { name: "Jordan", region: "Middle East" },
+  "414": { name: "Kuwait", region: "Middle East" },
+  "422": { name: "Lebanon", region: "Middle East" },
+  "512": { name: "Oman", region: "Middle East" },
+  "275": { name: "Palestine", region: "Middle East" },
+  "634": { name: "Qatar", region: "Middle East" },
+  "682": { name: "Saudi Arabia", region: "Middle East" },
+  "760": { name: "Syria", region: "Middle East" },
+  "792": { name: "Turkey", region: "Middle East" },
+  "784": { name: "UAE", region: "Middle East" },
+  "887": { name: "Yemen", region: "Middle East" },
+
+  // Africa
+  "012": { name: "Algeria", region: "Africa" },
+  "024": { name: "Angola", region: "Africa" },
+  "204": { name: "Benin", region: "Africa" },
+  "072": { name: "Botswana", region: "Africa" },
+  "854": { name: "Burkina Faso", region: "Africa" },
+  "108": { name: "Burundi", region: "Africa" },
+  "120": { name: "Cameroon", region: "Africa" },
+  "140": { name: "Central African Republic", region: "Africa" },
+  "148": { name: "Chad", region: "Africa" },
+  "174": { name: "Comoros", region: "Africa" },
+  "262": { name: "Djibouti", region: "Africa" },
+  "180": { name: "DR Congo", region: "Africa" },
+  "818": { name: "Egypt", region: "Africa" },
+  "226": { name: "Equatorial Guinea", region: "Africa" },
+  "232": { name: "Eritrea", region: "Africa" },
+  "748": { name: "Eswatini", region: "Africa" },
+  "231": { name: "Ethiopia", region: "Africa" },
+  "266": { name: "Gabon", region: "Africa" },
+  "270": { name: "Gambia", region: "Africa" },
+  "288": { name: "Ghana", region: "Africa" },
+  "324": { name: "Guinea", region: "Africa" },
+  "384": { name: "Ivory Coast", region: "Africa" },
+  "404": { name: "Kenya", region: "Africa" },
+  "426": { name: "Lesotho", region: "Africa" },
+  "430": { name: "Liberia", region: "Africa" },
+  "434": { name: "Libya", region: "Africa" },
+  "450": { name: "Madagascar", region: "Africa" },
+  "454": { name: "Malawi", region: "Africa" },
+  "466": { name: "Mali", region: "Africa" },
+  "478": { name: "Mauritania", region: "Africa" },
+  "504": { name: "Morocco", region: "Africa" },
+  "508": { name: "Mozambique", region: "Africa" },
+  "516": { name: "Namibia", region: "Africa" },
+  "562": { name: "Niger", region: "Africa" },
+  "566": { name: "Nigeria", region: "Africa" },
+  "178": { name: "Republic of Congo", region: "Africa" },
+  "646": { name: "Rwanda", region: "Africa" },
+  "686": { name: "Senegal", region: "Africa" },
+  "694": { name: "Sierra Leone", region: "Africa" },
+  "706": { name: "Somalia", region: "Africa" },
+  "710": { name: "South Africa", region: "Africa" },
+  "728": { name: "South Sudan", region: "Africa" },
+  "729": { name: "Sudan", region: "Africa" },
+  "834": { name: "Tanzania", region: "Africa" },
+  "768": { name: "Togo", region: "Africa" },
+  "788": { name: "Tunisia", region: "Africa" },
+  "800": { name: "Uganda", region: "Africa" },
+  "894": { name: "Zambia", region: "Africa" },
+  "716": { name: "Zimbabwe", region: "Africa" },
+
+  // South Asia
+  "050": { name: "Bangladesh", region: "South Asia" },
+  "064": { name: "Bhutan", region: "South Asia" },
+  "356": { name: "India", region: "South Asia" },
+  "462": { name: "Maldives", region: "South Asia" },
+  "524": { name: "Nepal", region: "South Asia" },
+  "586": { name: "Pakistan", region: "South Asia" },
+  "144": { name: "Sri Lanka", region: "South Asia" },
+
+  // East Asia
+  "156": { name: "China", region: "East Asia" },
+  "392": { name: "Japan", region: "East Asia" },
+  "496": { name: "Mongolia", region: "East Asia" },
+  "408": { name: "North Korea", region: "East Asia" },
+  "410": { name: "South Korea", region: "East Asia" },
+  "158": { name: "Taiwan", region: "East Asia" },
+
+  // Southeast Asia
+  "096": { name: "Brunei", region: "Southeast Asia" },
+  "116": { name: "Cambodia", region: "Southeast Asia" },
+  "626": { name: "East Timor", region: "Southeast Asia" },
+  "360": { name: "Indonesia", region: "Southeast Asia" },
+  "418": { name: "Laos", region: "Southeast Asia" },
+  "458": { name: "Malaysia", region: "Southeast Asia" },
+  "104": { name: "Myanmar", region: "Southeast Asia" },
+  "608": { name: "Philippines", region: "Southeast Asia" },
+  "702": { name: "Singapore", region: "Southeast Asia" },
+  "764": { name: "Thailand", region: "Southeast Asia" },
+  "704": { name: "Vietnam", region: "Southeast Asia" },
+
+  // Central Asia
+  "398": { name: "Kazakhstan", region: "Central Asia" },
+  "417": { name: "Kyrgyzstan", region: "Central Asia" },
+  "762": { name: "Tajikistan", region: "Central Asia" },
+  "795": { name: "Turkmenistan", region: "Central Asia" },
+  "860": { name: "Uzbekistan", region: "Central Asia" },
+
+  // Oceania
+  "036": { name: "Australia", region: "Oceania" },
+  "242": { name: "Fiji", region: "Oceania" },
+  "554": { name: "New Zealand", region: "Oceania" },
+  "598": { name: "Papua New Guinea", region: "Oceania" },
 };
 
 export const atrocities: Record<string, Atrocity[]> = {
@@ -1042,7 +1220,7 @@ export const atrocities: Record<string, Atrocity[]> = {
   { title: "Indefinite National Service", year: "1998-present", category: "political", description: "Forced labor with no end date. 400,000 trapped. North Korea with sunshine.", source: "https://en.wikipedia.org/wiki/National_service_in_Eritrea" },
   { title: "War Crimes in Tigray", year: "2020-2022", category: "war", target: "231", description: "Massacres at Axum, widespread sexual violence, looting. Denied being there for months.", source: "https://en.wikipedia.org/wiki/Axum_massacre" },
 ],
-"736": [
+"729": [
   { title: "Darfur Genocide", year: "2003-present", category: "internal", description: "200,000-400,000 killed, 2.5 million displaced. ICC charged al-Bashir with genocide.", source: "https://en.wikipedia.org/wiki/War_in_Darfur" },
   { title: "RSF-Army Civil War", year: "2023-present", category: "war", description: "Two coup generals fighting. 150,000+ dead, ethnic cleansing renewed. World's worst crisis, fraction of the attention.", source: "https://en.wikipedia.org/wiki/Sudanese_civil_war_(2023%E2%80%93present)" },
   { title: "Nuba Mountains Campaign", year: "1992-2002", category: "war", description: "Khartoum declared jihad on the Nuba people. Forced relocations, burning of villages, enslavement, forced conversions. Cultural genocide alongside physical killing. Resumed in 2011.", source: "https://en.wikipedia.org/wiki/Nuba_peoples" },

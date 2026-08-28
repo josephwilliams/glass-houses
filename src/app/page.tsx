@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import dynamic from "next/dynamic";
 import CountryDropdown from "@/components/CountryDropdown";
 import CategoryFilter from "@/components/CategoryFilter";
 import AtrocityPanel from "@/components/AtrocityPanel";
 import CountrySidebar from "@/components/CountrySidebar";
-import { atrocities, countryNames, type Category } from "@/data/atrocities";
+import { atrocities, countries, type Category } from "@/data/atrocities";
+import { site } from "@/site";
 
 const WorldMap = dynamic(() => import("@/components/WorldMap"), {
   ssr: false,
@@ -17,18 +18,23 @@ const WorldMap = dynamic(() => import("@/components/WorldMap"), {
   ),
 });
 
+const countryIds = Object.keys(atrocities);
+
 export default function Home() {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [filterCategory, setFilterCategory] = useState<Category | "all">("all");
   const [panelExpanded, setPanelExpanded] = useState(false);
 
-  const countryIds = Object.keys(atrocities);
   const pickRandom = useCallback(() => {
-    const pick = countryIds[Math.floor(Math.random() * countryIds.length)];
-    setSelectedCountry(pick);
-  }, [countryIds]);
+    setSelectedCountry(countryIds[Math.floor(Math.random() * countryIds.length)]);
+  }, []);
 
-  const selectedName = selectedCountry ? countryNames[selectedCountry] : null;
+  const closePanel = useCallback(() => {
+    setSelectedCountry(null);
+    setPanelExpanded(false);
+  }, []);
+
+  const selectedName = selectedCountry ? countries[selectedCountry]?.name : null;
 
   return (
     <div className="h-dvh flex overflow-hidden">
@@ -51,10 +57,10 @@ export default function Home() {
                   className="text-3xl tracking-tight leading-none"
                   style={{ fontFamily: "var(--font-display)" }}
                 >
-                  Glass Houses
+                  {site.name}
                 </h1>
                 <p className="text-[10px] text-[var(--fg-faint)] mt-1.5 tracking-[0.15em] uppercase">
-                  Click a country. Learn something uncomfortable.
+                  {site.tagline}
                 </p>
               </div>
 
@@ -108,11 +114,11 @@ export default function Home() {
             <div className="h-full bg-[var(--bg-raised)] border-l border-[var(--border)] shadow-2xl shadow-black/50">
               <AtrocityPanel
                 countryId={selectedCountry}
-                onClose={() => { setSelectedCountry(null); setPanelExpanded(false); }}
+                onClose={closePanel}
                 filterCategory={filterCategory}
                 onFilterChange={setFilterCategory}
                 expanded={panelExpanded}
-                onToggleExpand={() => setPanelExpanded((v) => !v)}
+                onToggleExpand={() => setPanelExpanded((value) => !value)}
               />
             </div>
           </div>
